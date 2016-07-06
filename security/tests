@@ -1,0 +1,4 @@
+while true
+do
+	curl --data "login=trash&lat=404&lng=404" https://ancient-hollows-75857.herokuapp.com/sendLocation
+done

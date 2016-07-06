@@ -1,0 +1,27 @@
+/* style.css for My Old Kentucky Home */
+
+h1 {
+	font-family: Arial;
+	color: #000099;
+	text-align: center;
+}
+
+body {
+	background-color: #ffc34d;
+}
+
+#lyrics {
+	font-family: Arial;
+	font-size: 25px;
+	color: #000099;
+	text-align: center;
+}
+
+#music_video {
+	margin-left: 29%;
+	margin-right: 25%;
+}
+
+span {
+	font-style: italic;
+}

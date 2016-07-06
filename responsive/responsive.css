@@ -1,0 +1,65 @@
+.software {
+	width: 128px; 
+	height: 240px; 
+	background: url(software.png);
+}
+
+@media (min-width: 1201px) {
+	.software {
+		background-position: 0px 0px;
+	}
+}
+
+@media (min-width: 1101px) and (max-width: 1200px) {
+	.software {
+		background-position: -128px 0px;
+	}
+}
+
+@media (min-width: 1001px) and (max-width: 1110px) {
+	.software {
+		background-position: -256px 0px;
+	}
+}
+
+@media (min-width: 901px) and (max-width: 1000px) {
+	.software {
+		background-position: -384px 0px;
+	}
+}
+
+@media (min-width: 801px) and (max-width: 900px) {
+	.software {
+		background-position: -512px 0px;
+	}
+}
+
+@media (min-width: 701px) and (max-width: 800px) {
+	.software {
+		background-position: 0px -240px;
+	}
+}
+
+@media (min-width: 601px) and (max-width: 700px) {
+	.software {
+		background-position: -128px -240px;
+	}
+}
+
+@media (min-width: 501px) and (max-width: 600px) {
+	.software {
+		background-position: -256px -240px;
+	}
+}
+
+@media (min-width: 401px) and (max-width: 500px) {
+	.software {
+		background-position: -384px -240px;
+	}
+}
+
+@media (max-width: 400px) {
+	.software {
+		background-position: -512px -240px;
+	}
+}

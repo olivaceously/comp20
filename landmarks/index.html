@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+		<title>Historic Landmarks</title>
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
+		<link rel="stylesheet" href="style.css" />
+		
+		<script>
+			var myLat = 0;
+			var myLng = 0;
+			var myLoc = new google.maps.LatLng(myLat, myLng);
+			var myOptions = {
+						zoom: 15, // The larger the zoom number, the bigger the zoom
+						center: myLoc,
+						mapTypeId: google.maps.MapTypeId.ROADMAP
+					};
+			var map;
+			var marker;
+			var login = "DEANNA_RILEY";
+			var infowindow = new google.maps.InfoWindow();
+			var request = new XMLHttpRequest();
+			var dataURL =  "http://pure-waters-57228.herokuapp.com/sendLocation";
+			
+			request.open("POST", dataURL, true);
+			request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+			var locationData;
+			var classmates;
+			var landmarks;
+			var closest_to_me;
+			var infoContent;
+
+			request.onreadystatechange = function ()
+			{
+				if(request.readyState == 4 && request.status == 200) {
+        				locationData = JSON.parse(request.responseText);
+        	   			classmates = locationData.people;
+        				landmarks = locationData.landmarks;
+           				placeClassmates();
+        				closest_to_me = placeLandmarks();
+        				drawPolyline(myLat, myLng, closest_to_me[1], closest_to_me[2]);
+        				renderMap();
+         			}
+			}
+        	
+			function initialize()
+			{
+				map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+				getMyLocation();
+			}
+			
+			function getMyLocation() {
+				if (navigator.geolocation) { // the navigator.geolocation object is supported on your browser
+					navigator.geolocation.getCurrentPosition(function(position) {
+						myLat = position.coords.latitude;
+						myLng = position.coords.longitude;
+						var myCurrLoc = "login=DEANNA_RILEY&lat=" + myLat + "&lng=" + myLng;
+						request.send(myCurrLoc);
+					});
+				}
+				else {
+					alert("Geolocation is not supported by your web browser.  What a shame!");
+				}
+			}
+
+			function renderMap()
+			{
+				me = new google.maps.LatLng(myLat, myLng);
+				map.panTo(me);
+
+				infoContent = "<p>My name is " + login + " and the closest landmark to me is " + closest_to_me[0] + ". It is " + closest_to_me[3] + " miles away from me.</p>";
+				
+				var icon = {
+    					url: "penguin.png",
+    					scaledSize: new google.maps.Size(40, 40), // scaled size
+    					origin: new google.maps.Point(0,0), // origin
+    					anchor: new google.maps.Point(0, 0) // anchor
+				};
+
+				marker = new google.maps.Marker({
+					position: me,
+					title: infoContent,
+					icon: icon
+				});
+				marker.setMap(map);
+
+				google.maps.event.addListener(marker, 'click', function() {
+					infowindow.setContent(marker.title);
+					infowindow.open(map, marker);
+				});
+				
+			}
+
+			function placeClassmates()
+			{
+				for (var i = 0; i < classmates.length; i++) {
+					var classmate_lat = classmates[i].lat;
+					var classmate_lng = classmates[i].lng;
+					var classmate_login = classmates[i].login;
+					var distance_between = haversine_formula(classmate_lat, myLat, classmate_lng, myLng);
+					var currentContent = "<p>" + classmate_login + " is " + distance_between + " away from me!</p>";
+					if (classmate_login != login) {  //I don't want to be on the map twice!
+						var icon = {
+    						url: "duck.png",
+    						scaledSize: new google.maps.Size(40, 40), // scaled size
+    						origin: new google.maps.Point(0,0), // origin
+    						anchor: new google.maps.Point(0, 0) // anchor
+						};
+
+						makeMarker(classmate_lat, classmate_lng, currentContent, icon);
+					}
+				}
+			}
+
+			function placeLandmarks()
+			{
+				var current_closest = 1;
+				var closest_landmark, closest_lng, closest_lat;
+				for (var i = 0; i < landmarks.length; i++) {
+					var landmark_lat = landmarks[i].geometry.coordinates[1];
+					var landmark_lng = landmarks[i].geometry.coordinates[0];
+					var landmark_name = landmarks[i].properties.Location_Name;
+					var landmark_dets = landmarks[i].properties.Details;
+					var distance_between = haversine_formula(landmark_lat, myLat, landmark_lng, myLng)
+					
+					if (distance_between <= 1) {
+						var icon = {
+    						url: "landmark.png",
+    						scaledSize: new google.maps.Size(30, 30), // scaled size
+    						origin: new google.maps.Point(0,0), // origin
+    						anchor: new google.maps.Point(0, 0) // anchor
+						};
+
+						makeMarker(landmark_lat, landmark_lng, landmark_dets, icon);	
+
+						if (distance_between <= current_closest) {
+							current_closest = distance_between;
+							closest_landmark = landmark_name;
+							closest_lat = landmark_lat;
+							closest_lng = landmark_lng;
+						} 
+					}	
+				}
+				return [closest_landmark, closest_lat, closest_lng, current_closest];
+			}
+
+			function makeMarker(latitude, longitude, content, icon)
+			{
+				var regular_marker = new google.maps.Marker({
+					position: new google.maps.LatLng(latitude, longitude),
+					title: content,
+					icon: icon
+				});
+
+				regular_marker.setMap(map);
+
+				google.maps.event.addListener(regular_marker, 'click', function() {
+					infowindow.setContent(regular_marker.title);
+					infowindow.open(map, regular_marker);
+				});
+			}
+
+			/* HAVERSINE FORMULA FROM STACKOVERFLOW */
+			function toRad(num){
+				return num * Math.PI / 180;
+			}
+
+			function haversine_formula(lat1, lat2, lon1, lon2) {
+				var R = 6371; // km 
+				var x1 = lat2-lat1;
+				var dLat = toRad(x1);  
+				var x2 = lon2-lon1;
+				var dLon = toRad(x2);  
+				var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+				                Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * 
+				                Math.sin(dLon/2) * Math.sin(dLon/2);  
+				var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+				var d = R * c; 
+
+				return d.toFixed(2); // how to define function return stuff?
+			}
+
+			function drawPolyline(myLat, myLng, landmarkLat, landmarkLng) {
+				var polylineCoordinates = [
+			    		{lat: myLat, lng: myLng},
+			    		{lat: landmarkLat, lng: landmarkLng}
+			        ];
+
+				var line = new google.maps.Polyline({
+					path: polylineCoordinates,
+					geodesic: true,
+					strokeColor: '#6495ED',
+					strokeOpacity: 1.0,
+					strokeWeight: 3.5
+				});
+
+				line.setMap(map);
+			}
+			
+		</script>
+	</head>
+	
+	<body onload="initialize()">
+		<div id="map_canvas"></div>
+	</body>
+</html>

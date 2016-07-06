@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>My Old Kentucky Home</title>
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+<h1 id="title">My Old Kentucky Home</h1>
+
+<video src="https://www.cs.tufts.edu/comp/20/my_old_kentucky_home.mp4" id="music_video" controls></video>
+<div id="lyrics"></div>
+
+<script>
+	var music_video = document.getElementById("music_video");
+	var lyrics = document.getElementById("lyrics");
+	music_video.addEventListener("timeupdate", printLyrics);
+
+	function printLyrics() {
+  		if (music_video.currentTime >= 8 && music_video.currentTime < 22) {
+  			lyrics.innerHTML = "<p>The sun shines bright in My Old <span>Kentucky</span> Home</p>" + 
+  							   "<p>'Tis summer, the people are gay;</p>"; 
+  		} else if (music_video.currentTime > 22 && music_video.currentTime < 35) {
+  			lyrics.innerHTML = "<p>The corn-top's ripe and the meadow's in the bloom</p>" + 
+  							   "<p><img src='corn.jpeg' alt='Corn Field'/></p>" +
+  							   "<p>While the birds make music all the day.</p>";
+ 		} else if (music_video.currentTime >= 36 && music_video.currentTime < 49) {
+  			lyrics.innerHTML = "<p>The young folks roll on the little cabin floor,</p>" + 
+  							   "<p>All merry, all happy and bright;</p>"; 
+ 		} else if (music_video.currentTime >= 49 && music_video.currentTime < 63) {
+  			lyrics.innerHTML = "<p>By 'n' by hard times comes a knocking at the door,</p>" + 
+  							   "<p>Then My Old <span>Kentucky</span> Home, good night!</p>" +
+  							   "<p><img src='kentucky.jpeg' alt='Kentucky Flag'/></p>"; 
+ 		} else if (music_video.currentTime >= 63 && music_video.currentTime < 75) {
+  			lyrics.innerHTML = "<p>Weep no more my lady </p>" +
+							   "<p>Oh weep no more today;</p>"
+		} else if (music_video.currentTime >= 75 && music_video.currentTime < 91) {
+  			lyrics.innerHTML = "<p>We will sing one song</p>" +
+							   "<p>For My Old <span>Kentucky</span> Home</p>" +
+							   "<p>For My Old <span>Kentucky</span> Home, far away</p>";
+		} else if (music_video.currentTime >= 91) {
+			lyrics.innerHTML = "<p><img src='kentucky.jpeg' alt='Kentucky Flag'/></p>"; 
+		}
+}
+	
+</script>
+</body>
+</html>	
